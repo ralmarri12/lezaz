@@ -373,11 +373,26 @@ class __db {
         return $this->insert($table, $syntax_sql,$feilds);
     }
 
-    function delete($table, $condetion) {
+    /***
+    *   @pre-condition: Tabe name:string, $condition:string (Opt.)
+    *   @post-condition: Result:PDOStatement.
+    *   @desc: deleting a record (specified in condition) of a table, if condition is not specified function would delete all records.
+    **/
+    function delete($table, $condetion = '*') {
+        // if condition is numeric, function assumed the id (PRIMARY KEY) of the entity.
         if (is_numeric($condetion))
             $condetion = 'id=' . $condetion;
-        $return = $this->query("select * from $table where $condetion");
+            
+        //if condition is start, function would delete all records. Otherways, function would delete specified condition.
+        if($condetion == '*')
+            $return = $this->query("SELECT * FROM $table");
+        else
+            $return = $this->query("select * from $table where $condetion");
+            
+        // Recall another private procedure to delete the record/s.
         $this->_delete($table, $condetion);
+        
+        // return PDOStatement. 
         return $return;
     }
 
